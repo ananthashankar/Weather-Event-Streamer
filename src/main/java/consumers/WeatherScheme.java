@@ -29,7 +29,7 @@ public class WeatherScheme implements Scheme
 		public static final String FIELD_MOONPHASE = "moonPhase";
 		public static final String FIELD_WINDBEARING = "windBearing";
 		public static final String FIELD_PRESSURE = "pressure";
-		public static final String FIELD_TIME = "time";
+		public static final String FIELD_ALERTS = "alerts";
         
         
 	private static final long serialVersionUID = -2990121166902741545L;
@@ -37,7 +37,6 @@ public class WeatherScheme implements Scheme
 	private static final Logger LOG = Logger.getLogger(WeatherScheme.class);
 	
         /**
-         * <timestamp>|truckid|driverId|eventType|long|lat
          * @param bytes
          * @return 
          */
@@ -65,7 +64,7 @@ public class WeatherScheme implements Scheme
 			String moonPhase = "";
 			String windBearing = "";
 			String pressure = "";
-			String time = "";
+			String alerts = "";
 			
 			for(int i=0; i<pieces.length; i++){
 				if(i == 0 && pieces[0].length() > 0){
@@ -77,7 +76,7 @@ public class WeatherScheme implements Scheme
 				else if(pieces[i].split(":")[0].equals("longitude")){
 					longitude = pieces[i].split(":")[1];
 				} 
-				else if(pieces[i].substring(0, 3).equals("Day")){
+				else if(pieces[i].length() >= 6 && pieces[i].substring(0, 3).equals("Day")){
 					day = pieces[i].substring(0, 6);
 				} 
 				else if(pieces[i].split(":")[0].equals("summary")){
@@ -117,10 +116,12 @@ public class WeatherScheme implements Scheme
 					windBearing = pieces[i].split(":")[1];
 				}
 				else if(pieces[i].split(":")[0].equals("pressure")){
-					pressure = pieces[i].split(":")[1];
+					//pressure = pieces[i].split(":")[1];
+					pressure = pieces[i].substring(9).trim();
 				}
-				else if(pieces[i].split(":")[0].equals("time")){
-					pressure = pieces[i].split(":")[1];
+				else if(pieces[i].split(":")[0].equals("Alerts")){
+					//pressure = pieces[i].split(":")[1];
+					alerts = pieces[i].substring(7).trim();
 				}
 				
 			}
@@ -129,7 +130,7 @@ public class WeatherScheme implements Scheme
 					cleanup(precipIntensity), cleanup(temperatureMax), cleanup(temperatureMin),
 					cleanup(icon), cleanup(cloudCover), cleanup(ozone), cleanup(humidity),
 					cleanup(windSpeed), cleanup(moonPhase), cleanup(windBearing),
-					cleanup(pressure), cleanup(time));
+					cleanup(pressure), cleanup(alerts));
 			
 		} 
                 catch (UnsupportedEncodingException e) 
@@ -146,7 +147,7 @@ public class WeatherScheme implements Scheme
             return new Fields(FIELD_PLACE, FIELD_DAY, FIELD_LATITUDE, FIELD_LONGITUDE, FIELD_SUMMARY, FIELD_PRECIPPROBABILITY,
             		FIELD_PRECIPINTENSITY, FIELD_TEMPERATUREMAX, FIELD_TEMPERATUREMIN,
             		FIELD_ICON, FIELD_CLOUDCOVER, FIELD_OZONE, FIELD_HUMIDITY,
-            		FIELD_WINDSPEED, FIELD_MOONPHASE, FIELD_WINDBEARING, FIELD_PRESSURE, FIELD_TIME);
+            		FIELD_WINDSPEED, FIELD_MOONPHASE, FIELD_WINDBEARING, FIELD_PRESSURE, FIELD_ALERTS);
 		
 	}
         
@@ -154,7 +155,7 @@ public class WeatherScheme implements Scheme
         {
             if (str != null)
             {
-                return str.trim().replace("\n", "").replace("\t", "").replace(":", "");
+                return str.trim().replace("\n", "").replace("\t", "");
             } 
             else
             {

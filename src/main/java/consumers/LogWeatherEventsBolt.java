@@ -44,7 +44,7 @@ public class LogWeatherEventsBolt extends BaseRichBolt
               tuple.getStringByField(WeatherScheme.FIELD_MOONPHASE)    + "," +
               tuple.getStringByField(WeatherScheme.FIELD_WINDBEARING)    + "," +
               tuple.getStringByField(WeatherScheme.FIELD_PRESSURE)    + "," +
-              tuple.getStringByField(WeatherScheme.FIELD_TIME));
+              tuple.getStringByField(WeatherScheme.FIELD_ALERTS));
     }
     
 }

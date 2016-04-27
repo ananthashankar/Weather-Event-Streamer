@@ -88,7 +88,7 @@ public class WeatherEventsProducer {
         {
         	Producer<String, String> producer = new Producer<String, String>(config);
         	for(String key : zones.keySet()){
-        	
+        		//Producer<String, String> producer = new Producer<String, String>(config);
 		    	ForecastIO fio = new ForecastIO(apikey);
 				fio.setUnits(ForecastIO.UNITS_SI);
 				fio.setLang(ForecastIO.LANG_ENGLISH);
@@ -111,20 +111,33 @@ public class WeatherEventsProducer {
 							messageSent += "longitude:" + zones.get(key)[1] + "\n";
 							
 							for(int j=0; j<h.length; j++){
-								messageSent += h[j]+": "+daily.getDay(i).getByKey(h[j]) + "\n";
+								messageSent += h[j]+": "+daily.getDay(i).getByKey(h[j]).replace(",", "")  + "\n";
 							}
-						
+							
+							//Alerts data
+							FIOAlerts alerts = new FIOAlerts(fio);
+							messageSent += "Alerts:";
+							if(alerts.NumberOfAlerts() <= 0){
+								messageSent += "No alerts for this location";
+							} else {
+								System.out.println("Alerts");
+								for(int j=0; j<alerts.NumberOfAlerts(); j++)
+									messageSent += alerts.getAlert(j).replace("\n", "|").replace(",", "") + " ";
+							}
+							messageSent += "\n";
 			                KeyedMessage<String, String> data = new KeyedMessage<String, String>(TOPIC, messageSent);
 			                producer.send(data);
 						}
-			                producer.close();
-			                k++;
-			                Thread.sleep(10000);
+			                //producer.close();
+			                
+			                Thread.sleep(5000);
 		            } catch (Exception e) {
 		                e.printStackTrace();
 		            }
 				}
-        }
+        	}
+        	k++;
+        	producer.close();
         }
         
     }

@@ -95,7 +95,7 @@ public class HiveTablePartitionAction implements RotationAction {
     public void loadData(String path, String datePartitionName, String hourPartitionName ) 
     {
     	
-    	String partitionValue = datePartitionName + "-" + hourPartitionName;
+    	String partitionValue = datePartitionName;
     	
     	LOG.info("About to add file["+ path + "] to a partitions["+partitionValue + "]");
     	
