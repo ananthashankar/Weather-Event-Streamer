@@ -54,26 +54,26 @@ public class WeatherEventsProducer {
     	SimpleRegressionImpl impl = new SimpleRegressionImpl();
     	
         
-        zones.put("Las Vegas", new String[]{"36.1699", "115.1398"});
-        zones.put("Mexico City", new String[]{"23.6345", "102.5528"});
-        zones.put("Toronto", new String[]{"43.6532", "79.3832"});
-        zones.put("New York City", new String[]{"40.7128", "74.0059"});
+    	zones.put("Las Vegas", new String[]{"36.1699", "-115.1398"});
+        zones.put("Mexico City", new String[]{"23.6345", "-102.5528"});
+        zones.put("Toronto", new String[]{"43.6532", "-79.3832"});
+        zones.put("New York City", new String[]{"40.7128", "-74.0059"});
         zones.put("Karachi", new String[]{"24.8615", "67.0099"});
         zones.put("New Delhi", new String[]{"28.6139", "77.2090"});
         zones.put("Manila", new String[]{"14.5995", "120.9842"});
-        zones.put("Sydney", new String[]{"33.8675", "151.2070"});
-        zones.put("Seoul", new String[]{"37.5665", "126.9780"}); 
+        zones.put("Sydney", new String[]{"-33.8675", "151.2070"});
+        zones.put("Seoul", new String[]{"37.5665", "126.9780"});
         zones.put("Tokyo", new String[]{"35.6895", "139.6917"});
         zones.put("Cairo", new String[]{"30.0444", "31.2357"});
-        zones.put("Los Angeles", new String[]{"34.0522", "118.2437"});
-        zones.put("Rio de Janeiro", new String[]{"22.9068", "43.1729"});
-        zones.put("Washington DC", new String[]{"38.9072", "77.0369"});
+        zones.put("Los Angeles", new String[]{"34.0522", "-118.2437"});
+        zones.put("Rio de Janeiro", new String[]{"-22.9068", "-43.1729"});
+        zones.put("Washington DC", new String[]{"38.9072", "-77.0369"});
         zones.put("Beijing", new String[]{"39.9042", "116.4074"});
-        zones.put("Chicago", new String[]{"41.8781", "87.6298"}); 
+        zones.put("Chicago", new String[]{"41.8781", "-87.6298"});
         zones.put("London", new String[]{"51.5074", "0.1278"});
-        zones.put("Paris", new String[]{"48.8566", "2.3522"}); 
-        zones.put("Madrid", new String[]{"40.4168", "3.7038"}); 
-        zones.put("Boston", new String[]{"42.3601", "71.0589"});
+        zones.put("Paris", new String[]{"48.8566", "2.3522"});
+        zones.put("Madrid", new String[]{"40.4168", "3.7038"});
+        zones.put("Boston", new String[]{"42.3601", "-71.0589"});
         
         LOG.debug("Using broker list:" + args[0] +", zk conn:" + args[1]);
         
