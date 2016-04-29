@@ -1,11 +1,14 @@
 package producer;
 
+import java.io.BufferedReader;
 /**
  * WeatherEventsProducer class simulates the real time weather event generation.
  *
  */
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.URISyntaxException;
 import java.sql.Timestamp;
 import java.util.*;
@@ -20,7 +23,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-
+import consumers.SimpleRegressionImpl;
 import kafka.javaapi.producer.Producer;
 import kafka.producer.KeyedMessage;
 import kafka.producer.ProducerConfig;
@@ -33,10 +36,11 @@ public class WeatherEventsProducer {
     private static final Logger LOG = Logger.getLogger(WeatherEventsProducer.class);
     private static final String apikey = "132c5a540bc50419b14b334ced3d4a6e";
     private static final HashMap<String, String[]> zones = new HashMap<String, String[]>();
+    //public static HashMap<String, String[]> params = new HashMap<String, String[]>();
     
     
     public static void main(String[] args) 
-            throws ParserConfigurationException, SAXException, IOException, URISyntaxException 
+            throws ParserConfigurationException, SAXException, IOException, URISyntaxException, NumberFormatException, IOException 
     {
     	
         if (args.length != 2) 
@@ -45,6 +49,10 @@ public class WeatherEventsProducer {
             System.out.println("Usage: WeatherEventsProducer <broker list> <zookeeper>");
             System.exit(-1);
         }
+        
+        // prepare model equations
+    	SimpleRegressionImpl impl = new SimpleRegressionImpl();
+    	
         
         zones.put("Las Vegas", new String[]{"36.1699", "115.1398"});
         zones.put("Mexico City", new String[]{"23.6345", "102.5528"});
@@ -102,6 +110,9 @@ public class WeatherEventsProducer {
 					System.out.println("No daily data.");
 				} else {
 					try {
+						int dayIn = 0;
+						int month = 0;
+						
 						for(int i = 0; i<daily.days(); i++){
 							
 							String messageSent = key + "\n";
@@ -112,6 +123,59 @@ public class WeatherEventsProducer {
 							
 							for(int j=0; j<h.length; j++){
 								messageSent += h[j]+": "+daily.getDay(i).getByKey(h[j]).replace(",", "")  + "\n";
+								if(h[j].equals("time")){
+									dayIn = Integer.parseInt(daily.getDay(i).getByKey(h[j]).replace(",", "").substring(0, 2));
+									month = Integer.parseInt(daily.getDay(i).getByKey(h[j]).replace(",", "").substring(3, 5));
+								}
+							}
+							
+							if(month == 1){
+									 //day of the year
+							   } else if(month == 2){
+								   dayIn = dayIn + 31; //day of the year
+							   } else if(month == 3){
+								   dayIn = dayIn + 59; //day of the year
+							   } else if(month == 4){
+								   dayIn = dayIn + 90; //day of the year
+							   } else if(month == 5){
+								   dayIn = dayIn + 120; //day of the year
+							   } else if(month == 6){
+								   dayIn = dayIn + 151; //day of the year
+							   } else if(month == 7){
+								   dayIn = dayIn + 181; //day of the year
+							   } else if(month == 8){
+								   dayIn = dayIn + 212; //day of the year
+							   } else if(month == 9){
+								   dayIn = dayIn + 242; //day of the year
+							   } else if(month == 10){
+								   dayIn = dayIn + 273; //day of the year
+							   } else if(month == 11){
+								   dayIn = dayIn + 303; //day of the year
+							   } else if(month == 12){
+								   dayIn = dayIn + 334; //day of the year
+							   }
+							
+							try {
+								FileInputStream fis = new FileInputStream("/opt/WeatherEvents/equation_params");
+								BufferedReader in = new BufferedReader(new InputStreamReader(fis));
+								String line;
+								 while ((line = in.readLine()) != null) {
+									 String[] params = line.split(",");
+									 if(params[0].equals(key)){
+										 
+										 String tempMaxModelForecast = String.valueOf(Double.parseDouble(params[1]) + Double.parseDouble(params[4]) * dayIn);
+										 String tempMinModelForecast = String.valueOf(Double.parseDouble(params[2]) + Double.parseDouble(params[5]) * dayIn);
+										 String pressureModelForecast = String.valueOf(Double.parseDouble(params[3]) + Double.parseDouble(params[6]) * dayIn);
+										 messageSent += "tempMaxModelForecast: " + tempMaxModelForecast + "\n";
+										 messageSent += "tempMinModelForecast: " + tempMinModelForecast + "\n";
+										 messageSent += "pressureModelForecast: " + pressureModelForecast + "\n";
+										 
+										 break;
+									 }
+								 }								
+								
+							} catch(Exception e){
+								LOG.error(e);
 							}
 							
 							//Alerts data

@@ -56,6 +56,10 @@ public class WeatherHBaseBolt implements IRichBolt
 	public static final byte[] COL_WINDBEARING = Bytes.toBytes("windBearing");
 	public static final byte[] COL_PRESSURE = Bytes.toBytes("pressure");
 	public static final byte[] COL_ALERTS = Bytes.toBytes("alerts");
+	public static final byte[] COL_TIME = Bytes.toBytes("time");
+	public static final byte[] COL_TEMPERATUREMAX_MODEL_FORECAST = Bytes.toBytes("tempMaxModelForecast");
+	public static final byte[] COL_TEMPERATUREMIN_MODEL_FORECAST = Bytes.toBytes("tempMinModelForecast");
+	public static final byte[] COL_PRESSURE_MODEL_FORECAST = Bytes.toBytes("pressureModelForecast");
     
     private static final byte[] COL_COUNT_VALUE = Bytes.toBytes("value");
 
@@ -110,6 +114,10 @@ public class WeatherHBaseBolt implements IRichBolt
         String windBearing = tuple.getStringByField(WeatherScheme.FIELD_WINDBEARING);
         String pressure = tuple.getStringByField(WeatherScheme.FIELD_PRESSURE);
         String alerts = tuple.getStringByField(WeatherScheme.FIELD_ALERTS);
+        String time = tuple.getStringByField(WeatherScheme.FIELD_TIME);
+        String tempMaxModelForecast = tuple.getStringByField(WeatherScheme.FIELD_TEMPERATUREMAX_MODEL_FORECAST);
+    	String tempMinModelForecast = tuple.getStringByField(WeatherScheme.FIELD_TEMPERATUREMIN_MODEL_FORECAST);
+    	String pressureModelForecast = tuple.getStringByField(WeatherScheme.FIELD_PRESSURE_MODEL_FORECAST);
 
       //  long incidentTotalCount = getInfractionCountForDriver(driverId);
 
@@ -118,7 +126,7 @@ public class WeatherHBaseBolt implements IRichBolt
 
             Put put = constructRow(EVENTS_TABLE_NAME, place, day, latitude, longitude, summary, precipProbability, precipIntensity,
             		temperatureMax, temperatureMin, icon, cloudCover, ozone, humidity, windSpeed, 
-            		moonPhase, windBearing, pressure, alerts );
+            		moonPhase, windBearing, pressure, alerts, time, tempMaxModelForecast, tempMinModelForecast, pressureModelForecast);
             this.eventsTable.put(put);
 
         } 
@@ -129,7 +137,7 @@ public class WeatherHBaseBolt implements IRichBolt
 
         collector.emit(tuple, new Values(place, day, latitude, longitude, summary, precipProbability, precipIntensity,
         		temperatureMax, temperatureMin, icon, cloudCover, ozone, humidity, windSpeed, 
-        		moonPhase, windBearing, pressure, alerts));
+        		moonPhase, windBearing, pressure, alerts, time, tempMaxModelForecast, tempMinModelForecast, pressureModelForecast));
         //acknowledge even if there is an error
         collector.ack(tuple);
     }
@@ -146,7 +154,8 @@ public class WeatherHBaseBolt implements IRichBolt
     		String longitude, String summary, String precipProbability,
     		String precipIntensity, String temperatureMax, String temperatureMin, String icon,
     		String cloudCover, String ozone, String humidity, String windSpeed, 
-    		String moonPhase, String windBearing, String pressure, String alerts) 
+    		String moonPhase, String windBearing, String pressure, String alerts, String time,
+    		String tempMaxModelForecast, String tempMinModelForecast, String pressureModelForecast) 
     {
 
         String rowKey = consructKey(day, place);
@@ -170,7 +179,10 @@ public class WeatherHBaseBolt implements IRichBolt
         put.add(CF_EVENTS_TABLE, COL_WINDBEARING, Bytes.toBytes(windBearing));
         put.add(CF_EVENTS_TABLE, COL_PRESSURE, Bytes.toBytes(pressure));
         put.add(CF_EVENTS_TABLE, COL_ALERTS, Bytes.toBytes(alerts));
-        
+        put.add(CF_EVENTS_TABLE, COL_TIME, Bytes.toBytes(time));
+        put.add(CF_EVENTS_TABLE, COL_TEMPERATUREMAX_MODEL_FORECAST, Bytes.toBytes(tempMaxModelForecast));
+        put.add(CF_EVENTS_TABLE, COL_TEMPERATUREMIN_MODEL_FORECAST, Bytes.toBytes(tempMinModelForecast));
+        put.add(CF_EVENTS_TABLE, COL_PRESSURE_MODEL_FORECAST, Bytes.toBytes(pressureModelForecast));
 
         return put;
     }
@@ -206,7 +218,9 @@ public class WeatherHBaseBolt implements IRichBolt
             		WeatherScheme.FIELD_TEMPERATUREMAX, WeatherScheme.FIELD_TEMPERATUREMIN, 
             		WeatherScheme.FIELD_ICON, WeatherScheme.FIELD_CLOUDCOVER, WeatherScheme.FIELD_OZONE,
             		WeatherScheme.FIELD_HUMIDITY, WeatherScheme.FIELD_WINDSPEED, WeatherScheme.FIELD_MOONPHASE,
-            		WeatherScheme.FIELD_WINDBEARING, WeatherScheme.FIELD_PRESSURE, WeatherScheme.FIELD_ALERTS));
+            		WeatherScheme.FIELD_WINDBEARING, WeatherScheme.FIELD_PRESSURE, WeatherScheme.FIELD_ALERTS, 
+            		WeatherScheme.FIELD_TIME, WeatherScheme.FIELD_TEMPERATUREMAX_MODEL_FORECAST, 
+            		WeatherScheme.FIELD_TEMPERATUREMIN_MODEL_FORECAST, WeatherScheme.FIELD_PRESSURE_MODEL_FORECAST));
     }
 
     @Override

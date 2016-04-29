@@ -1,10 +1,19 @@
 package consumers;
 
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
+import org.apache.commons.math3.stat.regression.SimpleRegression;
 import java.sql.Timestamp;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+
+import com.eclipsesource.json.ParseException;
 
 import backtype.storm.spout.Scheme;
 import backtype.storm.tuple.Fields;
@@ -30,7 +39,11 @@ public class WeatherScheme implements Scheme
 		public static final String FIELD_WINDBEARING = "windBearing";
 		public static final String FIELD_PRESSURE = "pressure";
 		public static final String FIELD_ALERTS = "alerts";
-        
+		public static final String FIELD_TIME = "time";
+		public static final String FIELD_TEMPERATUREMAX_MODEL_FORECAST = "tempMaxModelForecast";
+		public static final String FIELD_TEMPERATUREMIN_MODEL_FORECAST = "tempMinModelForecast";
+		public static final String FIELD_PRESSURE_MODEL_FORECAST = "pressureModelForecast";
+		
         
 	private static final long serialVersionUID = -2990121166902741545L;
 
@@ -41,7 +54,7 @@ public class WeatherScheme implements Scheme
          * @return 
          */
 	@Override
-	public List<Object> deserialize(byte[] bytes)
+	public List<Object> deserialize(byte[] bytes) 
         {
 		try 
                 {
@@ -65,6 +78,10 @@ public class WeatherScheme implements Scheme
 			String windBearing = "";
 			String pressure = "";
 			String alerts = "";
+			String time = "";
+			String tempMaxModelForecast = "";
+			String tempMinModelForecast = "";
+			String pressureModelForecast = "";
 			
 			for(int i=0; i<pieces.length; i++){
 				if(i == 0 && pieces[0].length() > 0){
@@ -116,21 +133,40 @@ public class WeatherScheme implements Scheme
 					windBearing = pieces[i].split(":")[1];
 				}
 				else if(pieces[i].split(":")[0].equals("pressure")){
-					//pressure = pieces[i].split(":")[1];
+					
 					pressure = pieces[i].substring(9).trim();
 				}
 				else if(pieces[i].split(":")[0].equals("Alerts")){
-					//pressure = pieces[i].split(":")[1];
+					
 					alerts = pieces[i].substring(7).trim();
+				}
+				else if(pieces[i].split(":")[0].equals("time")){
+					
+					time = pieces[i].substring(6, 16).trim();
+					time = time.substring(6) + "-" + time.substring(3, 5) + "-" + time.substring(0, 2);
+				}
+				else if(pieces[i].split(":")[0].equals("tempMaxModelForecast")){
+					
+					tempMaxModelForecast = pieces[i].split(":")[1].trim();
+				}
+				else if(pieces[i].split(":")[0].equals("tempMinModelForecast")){
+					
+					tempMinModelForecast = pieces[i].split(":")[1].trim();
+				}
+				else if(pieces[i].split(":")[0].equals("pressureModelForecast")){
+					
+					pressureModelForecast = pieces[i].split(":")[1].trim();
 				}
 				
 			}
+			
 
 			return new Values(cleanup(place), cleanup(day), cleanup(latitude), cleanup(longitude), cleanup(summary), cleanup(precipProbability), 
 					cleanup(precipIntensity), cleanup(temperatureMax), cleanup(temperatureMin),
 					cleanup(icon), cleanup(cloudCover), cleanup(ozone), cleanup(humidity),
 					cleanup(windSpeed), cleanup(moonPhase), cleanup(windBearing),
-					cleanup(pressure), cleanup(alerts));
+					cleanup(pressure), cleanup(alerts), cleanup(time), cleanup(tempMaxModelForecast),
+					cleanup(tempMinModelForecast), cleanup(pressureModelForecast));
 			
 		} 
                 catch (UnsupportedEncodingException e) 
@@ -147,7 +183,8 @@ public class WeatherScheme implements Scheme
             return new Fields(FIELD_PLACE, FIELD_DAY, FIELD_LATITUDE, FIELD_LONGITUDE, FIELD_SUMMARY, FIELD_PRECIPPROBABILITY,
             		FIELD_PRECIPINTENSITY, FIELD_TEMPERATUREMAX, FIELD_TEMPERATUREMIN,
             		FIELD_ICON, FIELD_CLOUDCOVER, FIELD_OZONE, FIELD_HUMIDITY,
-            		FIELD_WINDSPEED, FIELD_MOONPHASE, FIELD_WINDBEARING, FIELD_PRESSURE, FIELD_ALERTS);
+            		FIELD_WINDSPEED, FIELD_MOONPHASE, FIELD_WINDBEARING, FIELD_PRESSURE, FIELD_ALERTS,
+            		FIELD_TIME, FIELD_TEMPERATUREMAX_MODEL_FORECAST, FIELD_TEMPERATUREMIN_MODEL_FORECAST, FIELD_PRESSURE_MODEL_FORECAST);
 		
 	}
         
