@@ -162,7 +162,7 @@ public class WeatherEventsProducer {
 								 while ((line = in.readLine()) != null) {
 									 String[] params = line.split(",");
 									 if(params[0].equals(key)){
-										 
+										 // y = α + ßx ==> α = y-intercept, ß=slope
 										 String tempMaxModelForecast = String.valueOf(Double.parseDouble(params[1]) + Double.parseDouble(params[4]) * dayIn);
 										 String tempMinModelForecast = String.valueOf(Double.parseDouble(params[2]) + Double.parseDouble(params[5]) * dayIn);
 										 String pressureModelForecast = String.valueOf(Double.parseDouble(params[3]) + Double.parseDouble(params[6]) * dayIn);
